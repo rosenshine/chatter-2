@@ -1,7 +1,7 @@
 <%= @user.username %>'s contacts. Click to message.
 <% @users.each do |user| %>
   <% if user.username != @user.username %>
-    <p><%= user.username%></a></p>
+    <p><%= user.username %></a></p>
   <% end %>
 
 <% end %>

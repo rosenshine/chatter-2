@@ -1,0 +1,15 @@
+<h3>Send message from</h3> <%= @user.username %> to
+
+<form method="POST" action="/show">
+  <p>Message: <input type="text" name="message"></p>
+  <input type="submit">
+</form>
+
+  <label> Send to </label>
+  <% User.all.each do |user| %>
+    <%= user.username %>
+    <input id="<%= user.username %>" type="checkbox" name="users[]" value="<%= user.id %>">
+  <% end %>
+
+  <input type="submit" value="Create">
+</form>

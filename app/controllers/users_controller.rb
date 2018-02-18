@@ -21,6 +21,12 @@ class UsersController < ApplicationController
     erb :'users/index'
   end
 
+  post '/front' do
+    @receiver = User.find_by(username: params[:username])
+    @users = User.all
+    erb :'users/index'
+  end
+
   get '/login' do
     if !logged_in?
       erb :'users/login'
