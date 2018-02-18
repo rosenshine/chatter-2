@@ -9,6 +9,7 @@ class MessagesController < ApplicationController
   get '/messages' do
     @user = User.find_by_id(session[:user_id])
     @messages = Message.all
+    erb :'messages/messages'
   end
 
   post '/messages' do

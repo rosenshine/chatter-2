@@ -1,6 +1,6 @@
 <h3>Send message from</h3> <%= @user.username %> to <%= @receiver.username %>
 
-<form method="POST" action="/messages">
+<form method="POST" action="/recipients">
   <p>Message: <input type="text" name="message"></p>
   <input id="receiver_id" name="receiver_id" type="hidden" value="<%= @receiver.id() %>">
   <input type="submit">

@@ -5,23 +5,23 @@ class UsersController < ApplicationController
     if !logged_in?
       erb :'users/signup'
     else
-      redirect '/front'
+      redirect '/recipients'
     end
   end
 
   post '/signup' do
     @user = User.create(username: params[:username])
     session[:user_id] = @user.id
-    redirect to '/front'
+    redirect to '/recipients'
   end
 
-  get '/front' do
+  get '/recipients' do
     @user = User.find_by(id: session[:user_id])
     @users = User.all
     erb :'users/index'
   end
 
-  post '/front' do
+  post '/recipients' do
     @user = User.find_by(id: session[:user_id])
     @receiver = User.find_by_id(params[:receiver_id])
     @messages = Message.all
@@ -33,7 +33,7 @@ class UsersController < ApplicationController
     if !logged_in?
       erb :'users/login'
     else
-      redirect '/front'
+      redirect '/recipients'
     end
   end
 
@@ -41,7 +41,7 @@ class UsersController < ApplicationController
     @user = User.find_by(username: params[:username])
     if @user
       session[:user_id] = @user.id
-      redirect '/front'
+      redirect '/recipients'
     else
       redirect '/signup'
     end
