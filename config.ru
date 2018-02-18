@@ -11,5 +11,5 @@ end
 
 use Rack::MethodOverride
 run ApplicationController
-use ConversationsController
+use MessagesController
 use UsersController

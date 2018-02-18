@@ -1,0 +1,13 @@
+<h3>Send message from</h3> <%= @user.username %> to <%= @receiver.username %>
+
+<form method="POST" action="/messages">
+  <p>Message: <input type="text" name="message"></p>
+  <input id="receiver_id" name="receiver_id" type="hidden" value="<%= @receiver.id() %>">
+  <input type="submit">
+</form>
+
+<% @messages.each do |message| %>
+  <% if message.user_id == @user.id && message.receiver_id == @receiver.id %>
+    <%= message.message %>
+  <% end %>
+<% end %>

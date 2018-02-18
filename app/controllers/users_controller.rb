@@ -22,9 +22,11 @@ class UsersController < ApplicationController
   end
 
   post '/front' do
-    @receiver = User.find_by(username: params[:username])
+    @user = User.find_by(id: session[:user_id])
+    @receiver = User.find_by_id(params[:receiver_id])
+    @messages = Message.all
     @users = User.all
-    erb :'users/index'
+    erb :'messages/messages'
   end
 
   get '/login' do
