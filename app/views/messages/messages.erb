@@ -1,13 +1,14 @@
 <h3>Send message from</h3> <%= @user.username %> to <%= @receiver.username %>
 
-<form method="POST" action="/recipients">
+<form method="POST" action="/save_messages">
   <p>Message: <input type="text" name="message"></p>
   <input id="receiver_id" name="receiver_id" type="hidden" value="<%= @receiver.id() %>">
   <input type="submit">
 </form>
 
 <% @messages.each do |message| %>
-  <% if message.user_id == @user.id && message.receiver_id == @receiver.id %>
-    <%= message.message %>
+<% if message.user_id == @user.id && message.receiver_id == @receiver.id || message.user_id == @receiver.id && message.receiver_id == @user.id %>
+    <%= User.find_by_id(message.user_id).username %> said:
+    <%= message.message %></br>
   <% end %>
 <% end %>

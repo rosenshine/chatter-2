@@ -1,5 +1,5 @@
 <%= @user.username %>'s contacts. Click to message.
-<form action="/recipients" method="POST">
+<form action="/messages" method="POST">
 <% @users.each do |receiver| %>
   <% if receiver.username != @user.username %>
     <%= receiver.username %>

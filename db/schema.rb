@@ -13,15 +13,9 @@
 ActiveRecord::Schema.define(version: 20180218182620) do
 
   create_table "messages", force: :cascade do |t|
-    t.text "message"
-    t.integer "receiver_id"
-    t.integer "user_id"
+    t.text "input"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "users", force: :cascade do |t|
-    t.string "username"
   end
 
 end
