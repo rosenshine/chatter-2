@@ -4,16 +4,11 @@
   <body>
     <html>
       <body>
-         <h3>Send a message</h3>
-         <!-- <form id="form" action="/" method="POST">
-           <div id="input">
-           <input type="text" name="message" value="your message"></input><br />
-           <input type="text" name="sender" value="your name"></input><br />
-         </div>
-           <input type="submit">
-         </form> -->
+         <h3>Welcome to Chatter</h3>
          <form id="item" action="/" method="POST">
-            <input type="text" id="input" name="input" value="send a message"></input>
+           <input type="text" id="name" value="add your name"></input><br />
+            <input type="text" id="input" name="input" value="send your message"></input>
+            <input type="submit" style = "display: none" >
           </form>
          <div id="msgs"></div>
       </body>
@@ -25,29 +20,34 @@
           return function(msg){ el.innerHTML = msg + '<br />' + el.innerHTML; }
         }(document.getElementById('msgs'));
 
-        var ws       = new WebSocket('ws://' + window.location.host + window.location.pathname);
-        ws.onopen    = function()  { show('websocket opened'); };
-        ws.onclose   = function()  { show('websocket closed'); }
-        ws.onmessage = function(m) { show('websocket message: ' +  m.data); };
+        var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
+        var name = document.getElementById('name');
+        ws.onmessage = function(m) { show(`${name.value}: ${m.data}`); };
 
         var sender = function(f){
           var input     = document.getElementById('input');
             input.onclick = function(){ input.value = "" };
+            name.onclick = function(){ name.value = "" };
             f.onsubmit    = function( event ) {
+              var messageToSend =   `${name.value}: ${input.value}`
               event.preventDefault();
               $.ajax({
                 type: "POST",
                 url: '/',
-                data: {input: input.value},
+                data: {input: messageToSend},
                 success: console.log('success'),
                 dataType: "text"
               });
               ws.send(input.value);
-              input.value = "send a message";
+              input.value = "";
               return false;
           }
         }(document.getElementById('item'));
       })();
     }
   </script>
+
+  <% @messages.each do |message| %>
+    <%= message.input %><br />
+  <% end %>
 </html>

@@ -15,12 +15,12 @@ class ApplicationController < Sinatra::Base
     set :sockets, []
 
     get '/' do
+      @messages = Message.all.reverse
       if !request.websocket?
         erb :index
       else
         request.websocket do |ws|
           ws.onopen do
-            ws.send("Hello World!")
             settings.sockets << ws
           end
           ws.onmessage do |msg|
