@@ -1,53 +1,69 @@
 <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
 <html>
-  <body>
-    <html>
-      <body>
-         <h3>Welcome to Chatter</h3>
-         <form id="item" action="/" method="POST">
-           <input type="text" id="name" value="add your name"></input><br />
-            <input type="text" id="input" name="input" value="send your message"></input>
-            <input type="submit" style = "display: none" >
-          </form>
-         <div id="msgs"></div>
-      </body>
+<body>
+  <div class="container">
+    <div class="text-center">
+      <h3><i>Welcome to Chatter</i></h3>
+      <form id="item" action="/" method="POST">
+        <input type="text" id="name" value="add your name"></input><br />
+        <input type="text" id="input" name="input" value="send your message"></input>
+        <input type="submit" style = "display: none" >
+      </form>
+    </div>
+    <div id="msgs"></div>
+    <div class="row">
+      <div class="col-sm"></div>
+      <div class="col-sm">
+        <ul class="list-group">
+          <% @messages.each do |message| %>
+          <li class="list-group-item">
+            <b><%=  message.input[0..message.input.index(':') - 1] %></b>
+            <%= message.input[message.input.index(':')..message.input.length] %></li>
+            <% end %>
+          </ul>
+        </div>
+        <div class="col-sm"></div>
+      </div>
+    </div>
+  </div>
+</body>
 
-  <script type="text/javascript">
-    window.onload = function(){
-      (function(){
-        var show = function(el){
-          return function(msg){ el.innerHTML = msg + '<br />' + el.innerHTML; }
-        }(document.getElementById('msgs'));
+<script type="text/javascript">
+window.onload = function(){
+  (function(){
+    var show = function(el){
+      return function(msg){ el.innerHTML = msg + '<br />' + el.innerHTML; }
+    }(document.getElementById('msgs'));
 
-        var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
-        var name = document.getElementById('name');
-        ws.onmessage = function(m) { show(`${name.value}: ${m.data}`); };
+    var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
+    var name = document.getElementById('name');
+    ws.onmessage = function(m) { show(`${name.value}: ${m.data}`); };
 
-        var sender = function(f){
-          var input     = document.getElementById('input');
-            input.onclick = function(){ input.value = "" };
-            name.onclick = function(){ name.value = "" };
-            f.onsubmit    = function( event ) {
-              var messageToSend =   `${name.value}: ${input.value}`
-              event.preventDefault();
-              $.ajax({
-                type: "POST",
-                url: '/',
-                data: {input: messageToSend},
-                success: console.log('success'),
-                dataType: "text"
-              });
-              ws.send(input.value);
-              input.value = "";
-              return false;
-          }
-        }(document.getElementById('item'));
-      })();
-    }
-  </script>
-
-  <% @messages.each do |message| %>
-    <%= message.input %><br />
-  <% end %>
+    var sender = function(f){
+      var input     = document.getElementById('input');
+      input.onclick = function(){ input.value = "" };
+      name.onclick = function(){ name.value = "" };
+      f.onsubmit    = function( event ) {
+        var messageToSend =   `${name.value}: ${input.value}`
+        event.preventDefault();
+        $.ajax({
+          type: "POST",
+          url: '/',
+          data: {input: messageToSend},
+          success: console.log('success'),
+          dataType: "text"
+        });
+        ws.send(input.value);
+        input.value = "";
+        return false;
+      }
+    }(document.getElementById('item'));
+  })();
+}
+</script>
 </html>
