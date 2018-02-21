@@ -1,80 +1,76 @@
 <!-- bootstrap & jquery -->
-<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-
-
 <html>
+<head>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+</head>
 <body>
-  <div class="container">
+  <html>
+  <body>
     <div class="text-center">
-      <h3><i>Welcome to Chatter</i></h3>
+      <h3>Welcome to Chatter</h3>
       <form id="item" action="/" method="POST">
         <input type="text" id="name" value="add your name"></input><br />
         <input type="text" id="input" name="input" value="send your message"></input>
         <input type="submit" style = "display: none" >
       </form>
     </div>
-    <div id="msgs"></div>
+
+    <!-- websocket implementation -->
+    <script type="text/javascript">
+    window.onload = function(){
+      (function(){
+        // create function for displaying messages to other users
+        var show = function(el){
+          return function(msg){ el.innerHTML = '<li class=list-group-item>' + msg + '</li>' + el.innerHTML;}
+        }(document.getElementById('msgs'));
+
+        var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
+        var name = document.getElementById('name');
+
+        //receive new messages
+        ws.onmessage = function(m) { show(`${m.data}`); };
+
+        //sends msg to websocket
+        var sender = function(f){
+          var input     = document.getElementById('input');
+          input.onclick = function(){ input.value = "" };
+          name.onclick = function(){ name.value = "" };
+          f.onsubmit    = function( event ) {
+            var messageToSend =   `${name.value}: ${input.value}`
+            event.preventDefault();
+            //saves msg to db
+            $.ajax({
+              type: "POST",
+              url: '/',
+              data: {input: messageToSend},
+              success: console.log('success'),
+              dataType: "text"
+            });
+            ws.send(messageToSend);
+            input.value = "";
+            return false;
+          }
+        }(document.getElementById('item'));
+      })();
+    }
+    </script>
+
     <div class="row">
       <div class="col-sm"></div>
       <div class="col-sm">
-        <ul class="list-group">
+        <ul id="msgs" class="list-group">
           <% @messages.each do |message| %>
           <li class="list-group-item">
-            <!-- insert and format messages already in database -->
-            <b><%=  message.input[0..message.input.index(':') - 1] %></b>
-            <%= message.input[message.input.index(':')..message.input.length] %></li>
-            <% end %>
-          </ul>
-        </div>
-        <div class="col-sm"></div>
+            <%= message.input %><br />
+          </li>
+          <% end %>
+        </ul>
       </div>
+      <div class="col-sm"></div>
     </div>
   </div>
-</body>
-
-<!-- websocket implementation -->
-<script type="text/javascript">
-window.onload = function(){
-  (function(){
-    //open websocket
-    var ws = new WebSocket('ws://' + window.location.host + window.location.pathname);
-    //pull data from form
-    var name = document.getElementById('name');
-
-    // create function for displaying messages to other users
-    var show = function(el){
-      return function(msg){ el.innerHTML = msg + '<br />' + el.innerHTML; }
-    }(document.getElementById('msgs'));
-
-    //receive new messages
-    ws.onmessage = function(m) { show(`${name.value}: ${m.data}`); };
-
-    //sends msg to websocket
-    var sender = function(f){
-      var input     = document.getElementById('input');
-      input.onclick = function(){ input.value = "" };
-      name.onclick = function(){ name.value = "" };
-      f.onsubmit    = function( event ) {
-        var messageToSend =   `${name.value}: ${input.value}`
-        event.preventDefault();
-        //saves msg to db
-        $.ajax({
-          type: "POST",
-          url: '/',
-          data: {input: messageToSend},
-          success: console.log('success'),
-          dataType: "text"
-        });
-        ws.send(input.value);
-        input.value = "";
-        return false;
-      }
-    }(document.getElementById('item'));
-  })();
-}
-</script>
+</div>
 </html>
